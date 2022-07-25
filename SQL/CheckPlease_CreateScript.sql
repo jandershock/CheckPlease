@@ -8,15 +8,15 @@ USE [CheckPlease]
 GO
 
 
-DROP TABLE IF EXISTS [GroupOrderUsers];
-DROP TABLE IF EXISTS [GroupOrder];
+DROP TABLE IF EXISTS [GroupOrdersUserProfiles];
+DROP TABLE IF EXISTS [GroupOrders];
 DROP TABLE IF EXISTS [FoodItems];
 DROP TABLE IF EXISTS [Restaurants];
 DROP TABLE IF EXISTS [UserProfile];
 GO
 
 
-CREATE TABLE [UserProfile] (
+CREATE TABLE [UserProfiles] (
   [Id] int IDENTITY(1,1) PRIMARY KEY NOT NULL,
   [Email] nvarchar(255) NOT NULL,
   [FirebaseUserId] varchar(28) NOT NULL
@@ -25,7 +25,7 @@ CREATE TABLE [UserProfile] (
 )
 GO
 
-CREATE TABLE [GroupOrder] (
+CREATE TABLE [GroupOrders] (
   [Id] int PRIMARY KEY IDENTITY(1,1) NOT NULL,
   [OwnerId] int NOT NULL,
   [RestaurantId] int NOT NULL,
@@ -33,9 +33,9 @@ CREATE TABLE [GroupOrder] (
 )
 GO
 
-CREATE TABLE [GroupOrderUsers] (
+CREATE TABLE [GroupOrdersUserProfiles] (
   [Id] int PRIMARY KEY IDENTITY(1,1) NOT NULL,
-  [UserId] int NOT NULL,
+  [UserProfileId] int NOT NULL,
   [GroupOrderId] int NOT NULL,
   [HasOrdered] bit NOT NULL
 )
@@ -56,13 +56,13 @@ CREATE TABLE [FoodItems] (
 )
 GO
 
-ALTER TABLE [GroupOrder] ADD FOREIGN KEY ([OwnerId]) REFERENCES [UserProfile] ([Id]) ON DELETE CASCADE
+ALTER TABLE [GroupOrders] ADD FOREIGN KEY ([OwnerId]) REFERENCES [UserProfiles] ([Id]) ON DELETE CASCADE
 GO
 
-ALTER TABLE [GroupOrder] ADD FOREIGN KEY ([RestaurantId]) REFERENCES [Restaurants] ([Id]) ON DELETE CASCADE
+ALTER TABLE [GroupOrders] ADD FOREIGN KEY ([RestaurantId]) REFERENCES [Restaurants] ([Id]) ON DELETE CASCADE
 GO
 
-ALTER TABLE [GroupOrderUsers] ADD FOREIGN KEY ([GroupOrderId]) REFERENCES [GroupOrder] ([Id]) ON DELETE CASCADE
+ALTER TABLE [GroupOrdersUserProfiles] ADD FOREIGN KEY ([GroupOrderId]) REFERENCES [GroupOrders] ([Id]) ON DELETE CASCADE
 GO
 
 ALTER TABLE [FoodItems] ADD FOREIGN KEY ([RestaurantId]) REFERENCES [Restaurants] ([Id]) ON DELETE CASCADE

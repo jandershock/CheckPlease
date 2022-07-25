@@ -1,4 +1,5 @@
 ﻿using CheckPlease.Models;
+using System.Collections.Generic;
 
 namespace CheckPlease.Repositories
 {
@@ -7,5 +8,7 @@ namespace CheckPlease.Repositories
         void Add(UserProfile userProfile);
         UserProfile GetByFirebaseUserId(string firebaseUserId);
         UserProfile GetById(int id);
+
+        List<UserProfile> GetAll();
     }
 }

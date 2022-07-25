@@ -8,23 +8,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace CheckPlease.Repositories
 {
-    public class UserProfileRepository : IUserProfileRepository
+    public class UserProfileRepository : BaseRepository, IUserProfileRepository
     {
-
-        private readonly IConfiguration _config;
-
-        public UserProfileRepository(IConfiguration config)
-        {
-            _config = config;
-        }
-
-        public SqlConnection Connection
-        {
-            get
-            {
-                return new SqlConnection(_config.GetConnectionString("DefaultConnection"));
-            }
-        }
+        public UserProfileRepository(IConfiguration config) : base(config) { }
 
         public UserProfile GetById(int id)
         {
@@ -35,7 +21,7 @@ namespace CheckPlease.Repositories
                 {
                     cmd.CommandText = @"
                                     SELECT Id, Email, FirebaseUserId
-                                    FROM UserProfile
+                                    FROM UserProfiles
                                     WHERE Id = @Id";
 
                     cmd.Parameters.AddWithValue("@id", id);
@@ -68,7 +54,7 @@ namespace CheckPlease.Repositories
                 {
                     cmd.CommandText = @"
                                     SELECT Id, Email, FirebaseUserId
-                                    FROM UserProfile
+                                    FROM UserProfiles
                                     WHERE FirebaseUserId = @FirebaseuserId";
 
                     cmd.Parameters.AddWithValue("@FirebaseUserId", firebaseUserId);
@@ -101,7 +87,7 @@ namespace CheckPlease.Repositories
                 {
                     cmd.CommandText = @"
                                         INSERT INTO
-                                        UserProfile (Email, FirebaseUserId) 
+                                        UserProfiles (Email, FirebaseUserId) 
                                         OUTPUT INSERTED.ID
                                         VALUES(@email, @firebaseUserId)";
 
@@ -111,6 +97,11 @@ namespace CheckPlease.Repositories
                     userProfile.Id = (int)cmd.ExecuteScalar();
                 }
             }
+        }
+
+        public List<UserProfile> GetAll()
+        {
+            throw new NotImplementedException();
         }
     }
 }

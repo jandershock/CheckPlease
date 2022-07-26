@@ -1,10 +1,15 @@
 ﻿using CheckPlease.Models.ViewModels;
+using CheckPlease.Models;
 using CheckPlease.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using System.Collections.Generic;
 
 namespace CheckPlease.Controllers
 {
+    [Authorize]
     public class GroupOrdersController : Controller
     {
         private readonly IRestaurantsRepository _restaurantsRepository;
@@ -31,19 +36,37 @@ namespace CheckPlease.Controllers
         // GET: GroupOrdersController/Create
         public ActionResult Create()
         {
-            CreateGroupOrderViewModel vm = new CreateGroupOrderViewModel();
-            vm.Restaurants = _restaurantsRepository.GetAll();
-            vm.UserProfiles = _userProfileRespository.GetAll();
-            return View();
+            CreateGroupOrderViewModel vm = new CreateGroupOrderViewModel()
+            {
+                GroupOrder = new GroupOrder(),
+                Restaurants = _restaurantsRepository.GetAll(),
+                UserProfiles = _userProfileRespository.GetAll(),
+                SelectedUserIds = new List<int>()
+            };
+            return View(vm);
         }
 
         // POST: GroupOrdersController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(CreateGroupOrderViewModel vm)
         {
             try
             {
+                //if(GetCurrentUserProfile().Id != vm.GroupOrder.OwnerId)
+                //{
+                //    return Unauthorized();
+                //}
+                int groupOrderId = _userProfileRespository.AddGroupOrder(vm.GroupOrder);
+                foreach(int i in vm.SelectedUserIds)
+                {
+                    _userProfileRespository.CreateGroupOrderUserEntry(new GroupOrderUser()
+                    {
+                        UserId = i,
+                        GroupOrderId = groupOrderId,
+                        HasOrdered = false
+                    });
+                }
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -92,6 +115,11 @@ namespace CheckPlease.Controllers
             {
                 return View();
             }
+        }
+        private UserProfile GetCurrentUserProfile()
+        {
+            var firebaseUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            return _userProfileRespository.GetByFirebaseUserId(firebaseUserId);
         }
     }
 }

@@ -101,7 +101,63 @@ namespace CheckPlease.Repositories
 
         public List<UserProfile> GetAll()
         {
-            throw new NotImplementedException();
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                                        SELECT up.Id, up.Email, up.FirebaseUserId
+                                        FROM UserProfiles up";
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        List<UserProfile> users = new List<UserProfile>();
+                        while (reader.Read())
+                        {
+                            users.Add(new UserProfile()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Email = reader.GetString(reader.GetOrdinal("Email")),
+                                FirebaseUserId = reader.GetString(reader.GetOrdinal("FirebaseUserId"))
+                            });
+                        }
+                        return users;
+                    }
+                }
+            }
+        }
+
+        public int AddGroupOrder(GroupOrder groupOrder)
+        {
+            using(SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                                        INSERT INTO GroupOrders (OwnerId, RestaurantId)
+                                        VALUES (@ownerId, @restaurantId)";
+                    cmd.Parameters.AddWithValue("@ownerId", groupOrder.OwnerId);
+                    cmd.Parameters.AddWithValue("@restaurantId", groupOrder.RestaurantId);
+                    return (int)cmd.ExecuteScalar();
+                }
+            }
+        }
+
+        public void CreateGroupOrderUserEntry(GroupOrderUser gou)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO GroupOrdersUserProfiles (UserProfileId, GroupOrderId)
+                                        VALUES (@userProfileId, @groupOrderId)";
+                    cmd.Parameters.AddWithValue("@userProfileId", gou.UserId);
+                    cmd.Parameters.AddWithValue("@groupOrderId", gou.GroupOrderId);
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
     }
 }

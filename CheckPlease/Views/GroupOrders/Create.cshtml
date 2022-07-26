@@ -1,4 +1,4 @@
-﻿@model CheckPlease.Models.GroupOrder
+﻿@model CheckPlease.Models.ViewModels.CreateGroupOrderViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -6,31 +6,37 @@
 
 <h1>Create</h1>
 
-<h4>GroupOrder</h4>
+<h4>CreateGroupOrderViewModel</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Id" class="control-label"></label>
-                <input asp-for="Id" class="form-control" />
-                <span asp-validation-for="Id" class="text-danger"></span>
+                <label asp-for="GroupOrder.RestaurantId" class="control-label">Restaurant</label>
+                <select asp-for="GroupOrder.RestaurantId" class="form-control">
+                    @foreach (Restaurant r in Model.Restaurants)
+                    {
+                        <option value="@r.Id">@r.Name</option>
+                    }
+                    <option selected hidden disabled>-- Select Restaurant --</option>
+                </select>
+                <span asp-validation-for="GroupOrder.RestaurantId" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="OwnerId" class="control-label"></label>
-                <input asp-for="OwnerId" class="form-control" />
-                <span asp-validation-for="OwnerId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="RestaurantId" class="control-label"></label>
-                <input asp-for="RestaurantId" class="form-control" />
-                <span asp-validation-for="RestaurantId" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsReady" /> @Html.DisplayNameFor(model => model.IsReady)
-                </label>
+            <div id="group_member_fields">
+                <div class="form-group">
+                    @for (int i = 0; i < Model.GroupOrder.GroupSize; i++)
+                    {
+                        <label class="control-label">Group Member:</label>
+                        <select asp-for="@Model.SelectedUserIds" multiple class="form-control">
+                            @foreach (UserProfile up in Model.UserProfiles)
+                            {
+                                <option value="@up.Id">@up.Email</option>
+                            }
+                            <option selected hidden disabled>-- Select User --</option>
+                        </select>
+                    }
+                </div>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

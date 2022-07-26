@@ -7,5 +7,6 @@ namespace CheckPlease.Models.ViewModels
         public GroupOrder GroupOrder { get; set; }
         public List<Restaurant> Restaurants { get; set; }
         public List<UserProfile> UserProfiles { get; set; }
+        public List<int> SelectedUserIds { get; set; }
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.Collections.Generic;
+using System;
 
 namespace CheckPlease.Controllers
 {
@@ -57,19 +58,21 @@ namespace CheckPlease.Controllers
                 //{
                 //    return Unauthorized();
                 //}
-                int groupOrderId = _userProfileRespository.AddGroupOrder(vm.GroupOrder);
+                
+                vm.GroupOrder.OwnerId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                _userProfileRespository.AddGroupOrder(vm.GroupOrder);
                 foreach(int i in vm.SelectedUserIds)
                 {
                     _userProfileRespository.CreateGroupOrderUserEntry(new GroupOrderUser()
                     {
                         UserId = i,
-                        GroupOrderId = groupOrderId,
+                        GroupOrderId = vm.GroupOrder.Id,
                         HasOrdered = false
                     });
                 }
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch (Exception ex)
             {
                 return View();
             }
@@ -116,10 +119,6 @@ namespace CheckPlease.Controllers
                 return View();
             }
         }
-        private UserProfile GetCurrentUserProfile()
-        {
-            var firebaseUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            return _userProfileRespository.GetByFirebaseUserId(firebaseUserId);
-        }
+        
     }
 }

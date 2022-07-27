@@ -10,7 +10,7 @@ namespace CheckPlease.Repositories
         UserProfile GetById(int id);
 
         List<UserProfile> GetAll();
-        int AddGroupOrder(GroupOrder groupOrder);
+        void AddGroupOrder(GroupOrder groupOrder);
         void CreateGroupOrderUserEntry(GroupOrderUser gou);
     }
 }

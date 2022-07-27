@@ -12,7 +12,5 @@ namespace CheckPlease.Models
         public int RestaurantId { get; set; }
         [Required]
         public bool IsReady { get; set; }
-        public List<UserProfile> GroupMember { get; set; }
-        public int GroupSize = 1;
     }
 }

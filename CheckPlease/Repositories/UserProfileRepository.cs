@@ -127,7 +127,7 @@ namespace CheckPlease.Repositories
             }
         }
 
-        public int AddGroupOrder(GroupOrder groupOrder)
+        public void AddGroupOrder(GroupOrder groupOrder)
         {
             using(SqlConnection conn = Connection)
             {
@@ -135,11 +135,13 @@ namespace CheckPlease.Repositories
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                                        INSERT INTO GroupOrders (OwnerId, RestaurantId)
-                                        VALUES (@ownerId, @restaurantId)";
+                                        INSERT INTO GroupOrders (OwnerId, RestaurantId, IsReady)
+                                        OUTPUT INSERTED.Id
+                                        VALUES (@ownerId, @restaurantId, @isReady)";
                     cmd.Parameters.AddWithValue("@ownerId", groupOrder.OwnerId);
                     cmd.Parameters.AddWithValue("@restaurantId", groupOrder.RestaurantId);
-                    return (int)cmd.ExecuteScalar();
+                    cmd.Parameters.AddWithValue("@isReady", groupOrder.IsReady);
+                    groupOrder.Id = (int) cmd.ExecuteScalar();
                 }
             }
         }
@@ -151,10 +153,11 @@ namespace CheckPlease.Repositories
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO GroupOrdersUserProfiles (UserProfileId, GroupOrderId)
-                                        VALUES (@userProfileId, @groupOrderId)";
+                    cmd.CommandText = @"INSERT INTO GroupOrdersUserProfiles (UserProfileId, GroupOrderId, HasOrdered)
+                                        VALUES (@userProfileId, @groupOrderId, @hasOrdered)";
                     cmd.Parameters.AddWithValue("@userProfileId", gou.UserId);
                     cmd.Parameters.AddWithValue("@groupOrderId", gou.GroupOrderId);
+                    cmd.Parameters.AddWithValue("@hasOrdered", gou.HasOrdered);
                     cmd.ExecuteNonQuery();
                 }
             }

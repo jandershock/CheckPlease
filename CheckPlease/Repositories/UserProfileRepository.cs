@@ -162,5 +162,55 @@ namespace CheckPlease.Repositories
                 }
             }
         }
+
+        public List<GroupOrder> GetGroupOrdersByUser(int userId)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT [go].Id AS GroupOrderId, [go].IsReady, [go].OwnerId, [go].RestaurantId,
+
+		                                        r.[Name] AS RestaurantName,
+
+		                                        up.Email AS OwnerEmail
+                                        FROM GroupOrdersUserProfiles goup
+                                        JOIN GroupOrders [go] ON [go].Id = goup.GroupOrderId
+                                        JOIN Restaurants r ON r.Id = [go].RestaurantId
+                                        JOIN UserProfiles up ON up.Id = [go].OwnerId
+                                        WHERE goup.UserProfileId = @userId";
+                    cmd.Parameters.AddWithValue("@userId", userId);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        List<GroupOrder> groupOrders = new List<GroupOrder>();
+                        while (reader.Read())
+                        {
+                            groupOrders.Add(new GroupOrder()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("GroupOrderId")),
+                                IsReady = reader.GetBoolean(reader.GetOrdinal("IsReady")),
+                                OwnerId = reader.GetInt32(reader.GetOrdinal("OwnerId")),
+                                RestaurantId = reader.GetInt32(reader.GetOrdinal("RestaurantId")),
+
+                                Restaurant = new Restaurant()
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("RestaurantId")),
+                                    Name = reader.GetString(reader.GetOrdinal("RestaurantName"))
+                                },
+
+                                Owner = new UserProfile()
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("OwnerId")),
+                                    Email = reader.GetString(reader.GetOrdinal("OwnerEmail"))
+                                }
+                            });
+                        }
+                        return groupOrders;
+                    }
+                }
+            }
+        }
     }
 }

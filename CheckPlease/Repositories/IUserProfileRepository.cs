@@ -12,5 +12,6 @@ namespace CheckPlease.Repositories
         List<UserProfile> GetAll();
         void AddGroupOrder(GroupOrder groupOrder);
         void CreateGroupOrderUserEntry(GroupOrderUser gou);
+        List<GroupOrder> GetGroupOrdersByUser(int userId);
     }
 }

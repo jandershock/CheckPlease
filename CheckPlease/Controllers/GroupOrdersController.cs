@@ -25,7 +25,13 @@ namespace CheckPlease.Controllers
         // GET: GroupOrdersController
         public ActionResult Index()
         {
-            return View();
+            int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            GroupOrderIndexViewModel vm = new GroupOrderIndexViewModel()
+            {
+                GroupOrders = _userProfileRespository.GetGroupOrdersByUser(userId),
+                UserId = userId
+            };
+            return View(vm);
         }
 
         // GET: GroupOrdersController/Details/5
@@ -54,11 +60,6 @@ namespace CheckPlease.Controllers
         {
             try
             {
-                //if(GetCurrentUserProfile().Id != vm.GroupOrder.OwnerId)
-                //{
-                //    return Unauthorized();
-                //}
-                
                 vm.GroupOrder.OwnerId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 _userProfileRespository.AddGroupOrder(vm.GroupOrder);
                 foreach(int i in vm.SelectedUserIds)
@@ -74,7 +75,7 @@ namespace CheckPlease.Controllers
             }
             catch (Exception ex)
             {
-                return View();
+                return View(vm);
             }
         }
 

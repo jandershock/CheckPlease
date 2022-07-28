@@ -12,5 +12,7 @@ namespace CheckPlease.Models
         public int RestaurantId { get; set; }
         [Required]
         public bool IsReady { get; set; }
+        public Restaurant Restaurant { get; set; }
+        public UserProfile Owner { get; set; }
     }
 }

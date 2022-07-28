@@ -14,12 +14,14 @@ namespace CheckPlease.Controllers
     public class GroupOrdersController : Controller
     {
         private readonly IRestaurantsRepository _restaurantsRepository;
-        private readonly IUserProfileRepository _userProfileRespository;
+        private readonly IUserProfileRepository _userProfileRepository;
+        private readonly IGroupOrderRepository _groupOrderRepository;
 
-        public GroupOrdersController(IRestaurantsRepository restaurantsRepository, IUserProfileRepository userProfileRespository)
+        public GroupOrdersController(IRestaurantsRepository restaurantsRepository, IUserProfileRepository userProfileRepository, IGroupOrderRepository groupOrderRepository)
         {
             _restaurantsRepository = restaurantsRepository;
-            _userProfileRespository = userProfileRespository;
+            _userProfileRepository = userProfileRepository;
+            _groupOrderRepository = groupOrderRepository;
         }
 
         // GET: GroupOrdersController
@@ -28,7 +30,7 @@ namespace CheckPlease.Controllers
             int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             GroupOrderIndexViewModel vm = new GroupOrderIndexViewModel()
             {
-                GroupOrders = _userProfileRespository.GetGroupOrdersByUser(userId),
+                GroupOrders = _userProfileRepository.GetGroupOrdersByUser(userId),
                 UserId = userId
             };
             return View(vm);
@@ -37,6 +39,11 @@ namespace CheckPlease.Controllers
         // GET: GroupOrdersController/Details/5
         public ActionResult Details(int id)
         {
+            GroupOrderDetailsViewModel vm = new GroupOrderDetailsViewModel()
+            {
+                CurrentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value),
+                GroupOrder = _groupOrderRepository.GetGroupOrderById(id)
+            };
             return View();
         }
 
@@ -47,7 +54,7 @@ namespace CheckPlease.Controllers
             {
                 GroupOrder = new GroupOrder(),
                 Restaurants = _restaurantsRepository.GetAll(),
-                UserProfiles = _userProfileRespository.GetAll(),
+                UserProfiles = _userProfileRepository.GetAll(),
                 SelectedUserIds = new List<int>()
             };
             return View(vm);
@@ -61,10 +68,10 @@ namespace CheckPlease.Controllers
             try
             {
                 vm.GroupOrder.OwnerId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-                _userProfileRespository.AddGroupOrder(vm.GroupOrder);
+                _userProfileRepository.AddGroupOrder(vm.GroupOrder);
                 foreach(int i in vm.SelectedUserIds)
                 {
-                    _userProfileRespository.CreateGroupOrderUserEntry(new GroupOrderUser()
+                    _userProfileRepository.CreateGroupOrderUserEntry(new GroupOrderUser()
                     {
                         UserId = i,
                         GroupOrderId = vm.GroupOrder.Id,

@@ -14,5 +14,6 @@ namespace CheckPlease.Models
         public bool IsReady { get; set; }
         public Restaurant Restaurant { get; set; }
         public UserProfile Owner { get; set; }
+        public List<GroupOrderUser> GroupMembers { get; set; }
     }
 }

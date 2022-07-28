@@ -1,6 +1,9 @@
-﻿namespace CheckPlease.Repositories
+﻿using CheckPlease.Models;
+
+namespace CheckPlease.Repositories
 {
-    public class IGroupOrderRepository
+    public interface IGroupOrderRepository
     {
+        public GroupOrder GetGroupOrderById(int id);
     }
 }

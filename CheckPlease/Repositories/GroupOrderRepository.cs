@@ -2,6 +2,7 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CheckPlease.Repositories
 {
@@ -22,18 +23,25 @@ namespace CheckPlease.Repositories
 
 		                                        up2.Email AS OwnerEmail,
 
-		                                        goup.Id AS GoupId, goup.UserProfileId, goup.HasOrdered, goup.UserProfileId AS GoupUserProfileId,
+		                                        goup.Id AS GoupId, goup.HasOrdered, goup.UserProfileId AS GoupUserProfileId,
 
-		                                        up.Email AS GroupMemberEmail
+		                                        up.Email AS GroupMemberEmail,
+
+		                                        fig.FoodItemId,
+
+		                                        fi.Id AS FoodItemId, fi.[Description], fi.Price, fi.[Type]
+
                                         FROM GroupOrders [go]
                                         JOIN Restaurants r ON r.Id = [go].RestaurantId
                                         JOIN GroupOrdersUserProfiles goup ON goup.GroupOrderId = [go].Id
                                         JOIN [UserProfiles] up ON up.Id = UserProfileId
                                         JOIN [UserProfiles] up2 ON up2.Id = OwnerId
+                                        LEFT JOIN FoodItemsGoup fig ON fig.GroupOrdersUserProfilesId = goup.Id
+                                        LEFT JOIN FoodItems fi ON fi.Id = fig.FoodItemId
                                         WHERE [go].Id = @id;";
                     cmd.Parameters.AddWithValue("@id", id);
 
-                    using(SqlDataReader reader = cmd.ExecuteReader())
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         GroupOrder groupOrder = new GroupOrder()
                         {
@@ -58,19 +66,43 @@ namespace CheckPlease.Repositories
                             }
                             if (groupOrder.Owner == null)
                             {
-                                groupOrder.Owner = new UserProfile() 
+                                groupOrder.Owner = new UserProfile()
                                 {
                                     Id = reader.GetInt32(reader.GetOrdinal("OwnerId")),
                                     Email = reader.GetString(reader.GetOrdinal("OwnerEmail"))
                                 };
                             }
-                            groupOrder.GroupMembers.Add(new GroupOrderUser()
+
+                            int userId = reader.GetInt32(reader.GetOrdinal("GoupUserProfileId"));
+                            GroupOrderUser gou = groupOrder.GroupMembers.Where(gm => gm.UserId == userId).FirstOrDefault();
+                            if (gou == null)
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("GoupId")),
-                                GroupOrderId = reader.GetInt32(reader.GetOrdinal("GroupOrderId")),
-                                HasOrdered = reader.GetBoolean(reader.GetOrdinal("HasOrdered")),
-                                UserId = reader.GetInt32(reader.GetOrdinal("GoupUserProfileId"))
-                            });
+                                gou = new GroupOrderUser()
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("GoupId")),
+                                    GroupOrderId = reader.GetInt32(reader.GetOrdinal("GroupOrderId")),
+                                    HasOrdered = reader.GetBoolean(reader.GetOrdinal("HasOrdered")),
+                                    UserId = reader.GetInt32(reader.GetOrdinal("GoupUserProfileId")),
+                                    UserProfile = new UserProfile()
+                                    {
+                                        Id = reader.GetInt32(reader.GetOrdinal("GoupUserProfileId")),
+                                        Email = reader.GetString(reader.GetOrdinal("GroupMemberEmail"))
+                                    },
+                                    FoodItems = new List<FoodItem>()
+                                };
+                                groupOrder.GroupMembers.Add(gou);
+                            }
+
+
+                            if (!reader.IsDBNull(reader.GetOrdinal("FoodItemId"))){
+                                gou.FoodItems.Add(new FoodItem()
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("FoodItemId")),
+                                    Description = reader.GetString(reader.GetOrdinal("Description")),
+                                    Price = reader.GetDecimal(reader.GetOrdinal("Price")),
+                                    Type = reader.GetString(reader.GetOrdinal("Type"))
+                                });
+                            }
                         }
 
                         return groupOrder;

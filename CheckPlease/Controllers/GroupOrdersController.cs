@@ -37,6 +37,7 @@ namespace CheckPlease.Controllers
         }
 
         // GET: GroupOrdersController/Details/5
+
         public ActionResult Details(int id)
         {
             GroupOrderDetailsViewModel vm = new GroupOrderDetailsViewModel()
@@ -44,7 +45,7 @@ namespace CheckPlease.Controllers
                 CurrentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value),
                 GroupOrder = _groupOrderRepository.GetGroupOrderById(id)
             };
-            return View();
+            return View(vm);
         }
 
         // GET: GroupOrdersController/Create

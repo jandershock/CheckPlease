@@ -8,6 +8,11 @@
 
 <div>
     <hr />
+    <br />
+    @if (!Model.GroupOrder.GroupMembers.Where(gm => gm.UserId == Model.CurrentUserId).FirstOrDefault().HasOrdered)
+    {
+        @Html.ActionLink("Place your order", "AddOrder", new {id=Model.GroupOrder.Id})
+    }
 
     <br />
     <h3>Placed Orders</h3>
@@ -37,7 +42,7 @@
                                     @foodItem.Description
                                 </td>
                                 <td>
-                                    @foodItem.Price
+                                    $@foodItem.Price
                                 </td>
                             </tr>
                         }

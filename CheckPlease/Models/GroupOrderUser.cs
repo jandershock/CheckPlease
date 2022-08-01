@@ -9,6 +9,7 @@ namespace CheckPlease.Models
         public int GroupOrderId { get; set; }
         public bool HasOrdered { get; set; } = false;
         public List<FoodItem> FoodItems { get; set; }
+        public List<int> SelectedFoodItemIds { get; set; }
         public UserProfile UserProfile { get; set; }
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 
 namespace CheckPlease.Controllers
 {
@@ -16,12 +17,14 @@ namespace CheckPlease.Controllers
         private readonly IRestaurantsRepository _restaurantsRepository;
         private readonly IUserProfileRepository _userProfileRepository;
         private readonly IGroupOrderRepository _groupOrderRepository;
+        private readonly IFoodItemsRepository _foodItemsRepository;
 
-        public GroupOrdersController(IRestaurantsRepository restaurantsRepository, IUserProfileRepository userProfileRepository, IGroupOrderRepository groupOrderRepository)
+        public GroupOrdersController(IRestaurantsRepository restaurantsRepository, IUserProfileRepository userProfileRepository, IGroupOrderRepository groupOrderRepository, IFoodItemsRepository foodItemsRepository)
         {
             _restaurantsRepository = restaurantsRepository;
             _userProfileRepository = userProfileRepository;
             _groupOrderRepository = groupOrderRepository;
+            _foodItemsRepository = foodItemsRepository;
         }
 
         // GET: GroupOrdersController
@@ -37,7 +40,7 @@ namespace CheckPlease.Controllers
         }
 
         // GET: GroupOrdersController/Details/5
-
+        [Route("GroupOrders/{id}/Details")]
         public ActionResult Details(int id)
         {
             GroupOrderDetailsViewModel vm = new GroupOrderDetailsViewModel()
@@ -70,7 +73,7 @@ namespace CheckPlease.Controllers
             {
                 vm.GroupOrder.OwnerId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 _userProfileRepository.AddGroupOrder(vm.GroupOrder);
-                foreach(int i in vm.SelectedUserIds)
+                foreach (int i in vm.SelectedUserIds)
                 {
                     _userProfileRepository.CreateGroupOrderUserEntry(new GroupOrderUser()
                     {
@@ -128,6 +131,25 @@ namespace CheckPlease.Controllers
                 return View();
             }
         }
-        
+
+        [HttpGet]
+        [Route("GroupOrders/{id}/AddOrder")]
+        public ActionResult AddOrder(int id)
+        {
+            AddOrderViewModel vm = new AddOrderViewModel();
+            GroupOrder go = _groupOrderRepository.GetGroupOrderById(id);
+            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            vm.Menu = _foodItemsRepository.GetMenuByRestaurantId(go.RestaurantId);
+            vm.Gou = go.GroupMembers.Where(gm => gm.UserId == userId).FirstOrDefault();
+            return View(vm);
+        }
+
+        [HttpPost("GroupOrders/{id}/AddOrder")]
+        [ValidateAntiForgeryToken]
+        public ActionResult AddOrder(AddOrderViewModel vm)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

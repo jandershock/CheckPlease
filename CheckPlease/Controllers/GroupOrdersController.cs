@@ -160,6 +160,13 @@ namespace CheckPlease.Controllers
             _foodItemsRepository.CreateFoodItemsGoup(vm.Gou.SelectedFoodItemIds, gou.Id);
             gou.HasOrdered = true;
             _groupOrderRepository.UpdateGroupOrderUserHasOrderedStatus(gou);
+
+            if (go.GroupMembers.All(gm => gm.HasOrdered == true))
+            {
+                Console.WriteLine("Everyone has orderd");
+                go.IsReady = true;
+                _groupOrderRepository.UpdateGroupOrderIsReadyStatus(go);
+            }
             return RedirectToAction("Details", new { id = groupOrderId });
         }
 

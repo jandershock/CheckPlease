@@ -6,6 +6,7 @@ namespace CheckPlease.Repositories
     {
         public GroupOrder GetGroupOrderById(int id);
         void UpdateGroupOrderUserHasOrderedStatus(GroupOrderUser gou);
+        void UpdateGroupOrderIsReadyStatus(GroupOrder go);
         void DeleteGroupOrderById(int id);
     }
 }

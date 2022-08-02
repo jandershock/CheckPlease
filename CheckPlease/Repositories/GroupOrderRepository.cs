@@ -141,5 +141,22 @@ namespace CheckPlease.Repositories
                 }
             }
         }
+
+        public void UpdateGroupOrderIsReadyStatus(GroupOrder go)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"UPDATE GroupOrders
+                                        SET IsReady = @isReady
+                                        WHERE Id = @id";
+                    cmd.Parameters.AddWithValue("@isReady", go.IsReady);
+                    cmd.Parameters.AddWithValue("@id", go.Id);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
     }
 }

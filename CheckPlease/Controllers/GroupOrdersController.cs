@@ -145,9 +145,37 @@ namespace CheckPlease.Controllers
             return View(vm);
         }
 
-        [HttpPost("GroupOrders/{id}/AddOrder")]
+        [HttpPost("GroupOrders/{groupOrderId}/AddOrder")]
         [ValidateAntiForgeryToken]
-        public ActionResult AddOrder(AddOrderViewModel vm)
+        public ActionResult AddOrder(AddOrderViewModel vm, int groupOrderId)
+        {
+            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            GroupOrder go = _groupOrderRepository.GetGroupOrderById(groupOrderId);
+            GroupOrderUser gou = go.GroupMembers.Where(gm => gm.UserId == userId).FirstOrDefault();
+            if (gou == null)
+            {
+                return Unauthorized();
+            }
+            _foodItemsRepository.CreateFoodItemsGoup(vm.Gou.SelectedFoodItemIds, gou.Id);
+            gou.HasOrdered = true;
+            _groupOrderRepository.UpdateGroupOrderUserHasOrderedStatus(gou);
+            return RedirectToAction("Details", new { id = groupOrderId });
+        }
+
+        [HttpGet("GroupOrders/{groupOrderId}/EditOrder")]
+        public ActionResult EditOrder(int groupOrderId)
+        {
+            AddOrderViewModel vm = new AddOrderViewModel();
+            GroupOrder go = _groupOrderRepository.GetGroupOrderById(groupOrderId);
+            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            vm.Menu = _foodItemsRepository.GetMenuByRestaurantId(go.RestaurantId);
+            vm.Gou = go.GroupMembers.Where(gm => gm.UserId == userId).FirstOrDefault();
+            return View(vm);
+        }
+
+        [HttpPost("GroupOrders/{groupOrderId}/EditOrder")]
+        public ActionResult EditOrder(AddOrderViewModel vm)
         {
             throw new NotImplementedException();
         }

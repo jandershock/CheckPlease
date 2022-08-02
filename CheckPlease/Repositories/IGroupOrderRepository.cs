@@ -5,5 +5,6 @@ namespace CheckPlease.Repositories
     public interface IGroupOrderRepository
     {
         public GroupOrder GetGroupOrderById(int id);
+        void UpdateGroupOrderUserHasOrderedStatus(GroupOrderUser gou);
     }
 }

@@ -110,5 +110,21 @@ namespace CheckPlease.Repositories
                 }
             }
         }
+        public void UpdateGroupOrderUserHasOrderedStatus(GroupOrderUser gou)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"UPDATE GroupOrdersUserProfiles
+                                        SET HasOrdered = @hasOrdered
+                                        WHERE Id = @id";
+                    cmd.Parameters.AddWithValue("@hasOrdered", gou.HasOrdered);
+                    cmd.Parameters.AddWithValue("@id", gou.Id);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
     }
 }

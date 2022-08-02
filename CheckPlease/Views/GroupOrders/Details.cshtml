@@ -12,6 +12,9 @@
     @if (!Model.GroupOrder.GroupMembers.Where(gm => gm.UserId == Model.CurrentUserId).FirstOrDefault().HasOrdered)
     {
         @Html.ActionLink("Place your order", "AddOrder", new {id=Model.GroupOrder.Id})
+    } else
+    {
+        @Html.ActionLink("Edit your order", "EditOrder", new {groupOrderId=Model.GroupOrder.Id})
     }
 
     <br />

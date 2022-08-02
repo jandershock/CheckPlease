@@ -1,6 +1,7 @@
 ﻿using CheckPlease.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 
 namespace CheckPlease.Repositories
@@ -35,6 +36,33 @@ namespace CheckPlease.Repositories
                             });
                         }
                         return menu;
+                    }
+                }
+            }
+        }
+
+        public void CreateFoodItemsGoup(List<int> foodIds, int goupId)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO FoodItemsGoup
+                                        SELECT FoodItems.Id AS foodItemId, GroupOrdersUserProfiles.Id AS goupId
+                                        FROM FoodItems, GroupOrdersUserProfiles
+                                        WHERE FoodItems.Id = @foodId AND GroupOrdersUserProfiles.Id = @goupId
+	                                        AND NOT EXISTS ( 
+		                                        SELECT 1
+		                                        FROM FoodItemsGoup fig
+		                                        WHERE fig.FoodItemId = FoodItems.Id AND fig.GroupOrdersUserProfilesId = GroupOrdersUserProfiles.Id
+		                                        )";
+                    foreach(int foodId in foodIds)
+                    {
+                        cmd.Parameters.Clear();
+                        cmd.Parameters.AddWithValue("@foodId", foodId);
+                        cmd.Parameters.AddWithValue("@goupId", goupId);
+                        cmd.ExecuteNonQuery();
                     }
                 }
             }

@@ -2,8 +2,8 @@
 GO
 
 INSERT INTO UserProfiles (Email, FirebaseUserId)
-VALUES ('asdf@asdf.com', 'UPvkK3dzZqWl1JHBC6HpgEm1wH33'),
-	   ('frodo@shire.com', '7HoKCw88YIeukPWO0wsSVdvUKTC2'),
+VALUES ('aragorn@gondor.com', 'CQ6K6r47dvbauhuUFVsvlc2KAdr1'),
+	   ('frodo@shire.com', 'wCLGySr41TZ8P67I1WJFQlNsG0B2'),
 	   ('sam@shire.com', 'wAZVvJnTJHM0paAgzAyv1KGXIoF2'),
 	   ('merry@shire.com', '3iORHCSuyabUpBbrSTize6fBjC32'),
 	   ('pippin@shire.com', '6xRC0pETgxRbZk6QGpc3JXfE6wn1')

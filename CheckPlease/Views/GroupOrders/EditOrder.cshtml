@@ -1,0 +1,35 @@
+﻿@model CheckPlease.Models.ViewModels.AddOrderViewModel
+
+@{
+    ViewData["Title"] = "EditOrder";
+}
+
+<h1>EditOrder</h1>
+
+<h4>GroupOrderUser</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="EditOrder">
+            <div class="form-group">
+                <select asp-for="@Model.Gou.SelectedFoodItemIds" multiple>
+                    @foreach(var foodItem in Model.Menu)
+                    {
+                        <option value=@foodItem.Id>@foodItem.Description (@foodItem.Price)</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    @Html.ActionLink("Back to Group Order", "Details", new { id=Model.Gou.GroupOrderId })
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

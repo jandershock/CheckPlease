@@ -26,6 +26,8 @@ namespace CheckPlease
             services.AddTransient<IFirebaseAuthService, FirebaseAuthService>();
             services.AddTransient<IUserProfileRepository, UserProfileRepository>();
             services.AddTransient<IRestaurantsRepository, RestaurantsRepository>();
+            services.AddTransient<IGroupOrderRepository, GroupOrderRepository>();
+            services.AddTransient<IFoodItemsRepository, FoodItemsRepository>();
 
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

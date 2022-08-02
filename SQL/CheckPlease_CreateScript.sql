@@ -8,11 +8,13 @@ USE [CheckPlease]
 GO
 
 
+DROP TABLE IF EXISTS [FoodItemsGoup];
 DROP TABLE IF EXISTS [GroupOrdersUserProfiles];
 DROP TABLE IF EXISTS [GroupOrders];
 DROP TABLE IF EXISTS [FoodItems];
 DROP TABLE IF EXISTS [Restaurants];
-DROP TABLE IF EXISTS [UserProfile];
+DROP TABLE IF EXISTS [UserProfiles];
+DROP TABLE IF EXISTS [FoodItems];
 GO
 
 
@@ -51,8 +53,15 @@ CREATE TABLE [FoodItems] (
   [Id] int PRIMARY KEY IDENTITY(1,1) NOT NULL,
   [Description] nvarchar(255) NOT NULL,
   [RestaurantId] int NOT NULL,
-  [Price] decimal NOT NULL,
+  [Price] decimal(18,2) NOT NULL,
   [Type] nvarchar(255) NOT NULL
+)
+GO
+
+CREATE TABLE [FoodItemsGoup] (
+  [Id] int PRIMARY KEY IDENTITY(1,1) NOT NULL,
+  [FoodItemId] int NOT NULL,
+  [GroupOrdersUserProfilesId] int NOT NULL
 )
 GO
 
@@ -66,4 +75,10 @@ ALTER TABLE [GroupOrdersUserProfiles] ADD FOREIGN KEY ([GroupOrderId]) REFERENCE
 GO
 
 ALTER TABLE [FoodItems] ADD FOREIGN KEY ([RestaurantId]) REFERENCES [Restaurants] ([Id]) ON DELETE CASCADE
+GO
+
+ALTER TABLE [FoodItemsGoup] ADD FOREIGN KEY ([FoodItemId]) REFERENCES [FoodItems] ([Id])
+GO
+
+ALTER TABLE [FoodItemsGoup] ADD FOREIGN KEY ([GroupOrdersUserProfilesId]) REFERENCES [GroupOrdersUserProfiles] ([Id]) ON DELETE CASCADE
 GO

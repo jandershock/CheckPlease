@@ -80,5 +80,5 @@ GO
 ALTER TABLE [FoodItemsGoup] ADD FOREIGN KEY ([FoodItemId]) REFERENCES [FoodItems] ([Id])
 GO
 
-ALTER TABLE [FoodItemsGoup] ADD FOREIGN KEY ([GroupOrdersUserProfilesId]) REFERENCES [GroupOrdersUserProfiles] ([Id])
+ALTER TABLE [FoodItemsGoup] ADD FOREIGN KEY ([GroupOrdersUserProfilesId]) REFERENCES [GroupOrdersUserProfiles] ([Id]) ON DELETE CASCADE
 GO

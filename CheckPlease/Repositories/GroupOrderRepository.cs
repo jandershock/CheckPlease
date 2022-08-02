@@ -10,6 +10,21 @@ namespace CheckPlease.Repositories
     {
         public GroupOrderRepository(IConfiguration config) : base(config) { }
 
+        public void DeleteGroupOrderById(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"DELETE FROM GroupOrders
+                                        WHERE Id = @id;";
+                    cmd.Parameters.AddWithValue("@id", id);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
         public GroupOrder GetGroupOrderById(int id)
         {
             using (SqlConnection conn = Connection)

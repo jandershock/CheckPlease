@@ -114,7 +114,8 @@ namespace CheckPlease.Controllers
         // GET: GroupOrdersController/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            _groupOrderRepository.DeleteGroupOrderById(id);
+            return RedirectToAction("Index");
         }
 
         // POST: GroupOrdersController/Delete/5
@@ -175,9 +176,18 @@ namespace CheckPlease.Controllers
         }
 
         [HttpPost("GroupOrders/{groupOrderId}/EditOrder")]
-        public ActionResult EditOrder(AddOrderViewModel vm)
+        public ActionResult EditOrder(AddOrderViewModel vm, int groupOrderId)
         {
-            throw new NotImplementedException();
+            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            GroupOrder go = _groupOrderRepository.GetGroupOrderById(groupOrderId);
+            GroupOrderUser gou = go.GroupMembers.Where(gm => gm.UserId == userId).FirstOrDefault();
+            if (gou == null)
+            {
+                return Unauthorized();
+            }
+            _foodItemsRepository.DeleteFoodItemsByGoupId(gou.Id);
+            _foodItemsRepository.CreateFoodItemsGoup(vm.Gou.SelectedFoodItemIds, gou.Id);
+            return RedirectToAction("Details", new { id = groupOrderId });
         }
     }
 }
